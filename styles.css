@@ -1259,3 +1259,26 @@ body {
     font-size: 24px; /* Убедимся, что флаг имеет нужный размер */
     line-height: 1; /* Корректировка выравнивания */
 }
+
+#signalTypeValue {
+  background: linear-gradient(
+    135deg,
+    #a0a0a0,
+    #5a6a7f,
+    #a0a0a0
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 1px;
+  animation: steelShine 4s ease infinite;
+}
+
+@keyframes steelShine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
