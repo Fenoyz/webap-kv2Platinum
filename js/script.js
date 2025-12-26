@@ -23,8 +23,8 @@ const CONFIG = {
     LOADING_INCREMENT_MIN: 5,
     LOADING_INCREMENT_MAX: 15,
     LOADING_INTERVAL_MS: 200,
-    MIN_ACCURACY: 65,
-    MAX_ACCURACY_VARIATION: 30,
+    MIN_ACCURACY: 90,
+    MAX_ACCURACY_VARIATION: 5,
     CURRENCY_TO_FLAG_MAP: {
         EUR: "eu",
         USD: "us",
@@ -1105,10 +1105,7 @@ function startTimer(duration) {
 
 function completeSignal() {
     if (!state.currentSignal) return;
-    const minWinRate = 0.90;
-    const maxWinRate = 0.95;
-    const randomWinRate = minWinRate + Math.random() * (maxWinRate - minWinRate);
-    const isWin = Math.random() < randomWinRate;
+    const isWin = Math.random() > 0.5;
     const result = isWin ? "win" : "loss";
     const resultSimple = isWin
         ? translations.btnTexts[state.currentLang]?.win || "Win"
