@@ -7,18 +7,18 @@ const CONFIG = {
     MAX_HISTORY_ITEMS: 20,
     MAX_HISTORY_STORAGE_ITEMS: 100,
     TIMEFRAME_SECONDS: {
-        "1S": 1,
-        "5S": 5,
-        "15S": 15,
-        "30S": 30,
-        "1M": 60,
-        "3M": 180,
-        "5M": 300,
-        "15M": 900,
-        "30M": 1800,
-        "1H": 3600,
-        "3H": 10800,
-        "4H": 14400,
+        "S1": 1,
+        "S5": 5,
+        "S15": 15,
+        "S30": 30,
+        "M1": 60,
+        "M3": 180,
+        "M5": 300,
+        "M15": 900,
+        "M30": 1800,
+        "H1": 3600,
+        "H3": 10800,
+        "H4": 14400,
     },
     LOADING_INCREMENT_MIN: 5,
     LOADING_INCREMENT_MAX: 15,
@@ -142,7 +142,7 @@ const state = {
     currentTheme: CONFIG.DEFAULT_THEME,
     tradingType: "regular",
     selectedPair: "EURUSD",
-    selectedTimeframe: "1M",
+    selectedTimeframe: "M1",
     isSignalActive: false,
     timer: null,
     timerDuration: 0,
@@ -1063,7 +1063,7 @@ function generateSignalAfterLoading() {
         directionText.className =
             "direction-text " + (isBuy ? "direction-buy" : "direction-sell");
     }
-    const duration = CONFIG.TIMEFRAME_SECONDS[state.selectedTimeframe] || 5;
+    const duration = getTimeframeDuration(state.selectedTimeframe);
     state.currentSignal = {
         pair: state.selectedPair,
         pairName: pair.name,
@@ -1105,7 +1105,10 @@ function startTimer(duration) {
 
 function completeSignal() {
     if (!state.currentSignal) return;
-    const isWin = Math.random() > 0.5;
+    const minWinRate = 0.70;
+    const maxWinRate = 0.75;
+    const randomWinRate = minWinRate + Math.random() * (maxWinRate - minWinRate);
+    const isWin = Math.random() < randomWinRate;
     const result = isWin ? "win" : "loss";
     const resultSimple = isWin
         ? translations.btnTexts[state.currentLang]?.win || "Win"
@@ -1318,3 +1321,35 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+/**
+ * Преобразует код таймфрейма (например, "M1", "S15", "H4") в длительность в секундах.
+ * Поддерживаемые префиксы:
+ * - S = секунды
+ * - M = минуты
+ * - H = часы
+ * Примеры: "S5" → 5, "M1" → 60, "H1" → 3600
+ * @param {string} code - код таймфрейма (например, "M5")
+ * @returns {number} - длительность в секундах, по умолчанию 5
+ */
+function getTimeframeDuration(code) {
+  if (typeof code !== "string") return 5;
+
+  const match = code.match(/^([SMH])(\d+)$/i);
+  if (!match) return 5;
+
+  const [, unit, valueStr] = match;
+  const value = parseInt(valueStr, 10);
+  if (isNaN(value) || value <= 0) return 5;
+
+  switch (unit.toUpperCase()) {
+    case "S":
+      return value; // секунды
+    case "M":
+      return value * 60; // минуты → секунды
+    case "H":
+      return value * 3600; // часы → секунды
+    default:
+      return 5;
+  }
+}
